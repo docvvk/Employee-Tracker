@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+
+<html lang="en-us">
+
+  <head>
+
+    <meta charset="UTF-8">
+    <title>EmployeeTasker</title>
+
+    
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+    <!--  CSS -->
+
+    <!-- Firebase Reference -->
+    <script src="https://www.gstatic.com/firebasejs/5.1.0/firebase.js"></script>
+    <!-- Jquery Reference -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <!-- Moment.js Reference -->
+    <script src="https://cdn.jsdelivr.net/momentjs/2.12.0/moment.min.js"></script>
+
+  </head>
+
+  <body>
+
+    <!-- Train Time -->
+    <div class="container">
+
+      <!-- Jumbotron -->
+      <div class="jumbotron">
+        <h1 class="text-center">EMPLOYEE TASKER</h1>
+        <h3 class="text-center">A Comprehensive Directory of Employee Billable Hours</h3>
+      </div>
+
+      <div class="row">
+
+        <div class="col-12">
+
+        <!-- Employee Schedule -->
+          <div class="panel panel-primary">
+            <div class="panel-heading">
+              <h3 class="panel-title"><strong>CURRENT EMPLOYEES</strong></h3>
+            </div>
+            <div class="panel-body">
+              <table class="table table-hover" id='time-table'>
+                <thead>
+                  <tr>
+                    <th>Employee Name</th>
+                    <th>Role</th>
+                    <th>Start Date</th>
+                    <th>Months Worked</th>
+                    <th>Monthly Rate ($)</th>
+                    <th>Total Billed</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- <tr>
+                      <td id="empName"></td>
+                      <td id="empRole"></td>
+                      <td id="empDate"></td>
+                      <td id="momthsWorked"></td>
+                      <td id="empRate"></td>
+                      <td id="totalBilled"></td>
+  
+                  </tr> -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Add EMPLOYEE  -->
+          <div class="panel panel-primary">
+            <div class="panel-heading">
+              <h3 class="panel-title"><strong>Add Employee</strong></h3>
+            </div>
+            <div class="panel-body">
+
+              <!-- Entry Form -->
+              <form>
+                <div class="form-group">
+                  <label for="employee-name-input">Employee Name</label>
+                  <input type="text" class="form-control" id="employee-name-input">
+                </div>
+                <div class="form-group">
+                  <label for="role-input">Role</label>
+                  <input type="text" class="form-control" id="role-input">
+                </div>
+                <div class="form-group">
+                  <label for="start-date-input">Start Date (DD/MM/YY - ex: 01/01/1989)</label>
+                  <input type="text" class="form-control" id="start-date-input">
+                </div>
+                <div class="form-group">
+                  <label for="rate-input">Monthly Rate</label>
+                  <input type="text" class="form-control" id="rate-input">
+                </div>
+                <button type="submit" class="btn btn-primary" id="add-employee-btn">Submit</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Script -->
+    <!-- jQuery -->
+  
+  <script>
+     // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyBApaFM7giiJHaUClMM7uj31qR1f80RlLc",
+    authDomain: "train-scheduler-docvvk.firebaseapp.com",
+    databaseURL: "https://train-scheduler-docvvk.firebaseio.com",
+    projectId: "train-scheduler-docvvk",
+    storageBucket: "train-scheduler-docvvk.appspot.com",
+    messagingSenderId: "999298774452"
+  };
+  firebase.initializeApp(config);
+
+  var employeeData = firebase.database();
+
+  
+
+//   database.ref().push(temp);
+
+$("#add-employee-btn").on("click", function(event) {
+
+    event.preventDefault();
+
+    var name = $("#employee-name-input").val().trim();
+    var role = $("#role-input").val().trim();
+    var date = $("#start-date-input").val().trim();
+    var rate = $("#rate-input").val().trim();
+
+    var temp = {
+        name: name,
+        role: role,
+        date: date,
+        rate: rate,
+        dateAdded: firebase.database.ServerValue.TIMESTAMP
+    }
+
+    console.log(temp.name);
+    console.log(temp.role);
+    console.log(temp.date);
+    console.log(temp.rate);
+    console.log(temp.dateAdded);
+
+    employeeData.ref().push(temp);
+
+    $("#employee-name-input").val('');
+    $("#role-input").val('');
+    $("#start-date-input").val('');
+    $("#rate-input").val('');
+
+    return false;
+
+
+        //    $('tbody').append("<tr><td>" + name + "</td><td>" +
+        //   role + "</td><td>" + 
+        //   date + "</td><td>" +
+        //   '' + "</td><td>" +
+        //   rate + "</td><td>" + '' + "</tr>");
+
+  })
+  var monthsWorked;
+    console.log(monthsWorked);
+    var totalBilled;
+
+  employeeData.ref().on("child_added", function(snapshot) {
+    console.log(snapshot.val());
+
+    var empName = snapshot.val().name;
+    var empRole = snapshot.val().role;
+    var empDate = snapshot.val().date;
+    var empRate = snapshot.val().rate;
+
+    monthsWorked = moment().diff(moment(empDate), 'months');
+    totalBilled = monthsWorked * empRate;
+  
+
+    $("#time-table > tbody").prepend("<tr><td>" + empName + "</td><td>" + empRole + "</td><td>" + empDate + "</td><td>" + monthsWorked + "</td><td>" + empRate + "</td><td>" + totalBilled + "</td></tr>");
+
+
+    // $("#empName").prepend(empName);
+    // $("#empRole").text(empRole);
+    // $("#empDate").text(empDate);
+    // $("#monthsWorked").text(monthsWorked);
+    // $("#empRate").text(empRate);
+    // $("#totalBilled").text(totalBilled);
+
+
+    
+  })
+
+
+
+  </script>
+</body>
+<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> -->
+
+</html>
